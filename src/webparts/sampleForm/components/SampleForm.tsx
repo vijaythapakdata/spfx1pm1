@@ -1,43 +1,110 @@
 import * as React from 'react';
-import styles from './SampleForm.module.scss';
+// import styles from './SampleForm.module.scss';
 import type { ISampleFormProps } from './ISampleFormProps';
-import { escape } from '@microsoft/sp-lodash-subset';
+import { ISampleFormState } from './ISampleFormState';
+import {Dialog} from "@microsoft/sp-dialog";
+import {Web} from "@pnp/sp/presets/all";
+import "@pnp/sp/items";
+import "@pnp/sp/lists";
+import { TextField ,Slider, PrimaryButton} from '@fluentui/react';
+// import { Slider } from 'antd';
+export default class SampleForm extends React.Component<ISampleFormProps,ISampleFormState> {
+  constructor(props:any){
+    super(props);
+    this.state={
+      Name:"",
+      Age:"",
+      Salary:"",
+      Score:0,
+      Address:"",
+      EmailAddress:""
+    }
+  }
+  //create form
+  private async createForm(){
+// read site url
+let web=Web(this.props.siteurl); //url
+await web.lists.getByTitle(this.props.ListName).items.add({
+  Title:this.state.Name,
+  EmailAddress:this.state.EmailAddress,
+  Age:parseInt(this.state.Age),
+  Salary:parseFloat(this.state.Salary),
+  Score:parseInt(this.state.Score),
+  Address:this.state.Address
+})
+.then((data)=>{
+  Dialog.alert("Data has been saved successully");
+  console.log(data);
+  this.setState({
+    Name:"",
+      Age:"",
+      Salary:"",
+      Score:0,
+      Address:"",
+      EmailAddress:""
+  })
+})
+.catch((err)=>{
+   Dialog.alert("Error while creating the items");
+  console.error(err);
+});
+  }
 
-export default class SampleForm extends React.Component<ISampleFormProps> {
+  //form event
+  private handleForm=(fieldvalue:keyof ISampleFormState,value:string|boolean|number):void=>{
+    this.setState({[fieldvalue]:value} as unknown as Pick<ISampleFormState,keyof ISampleFormState>)
+  }
   public render(): React.ReactElement<ISampleFormProps> {
-    const {
-      description,
-      isDarkTheme,
-      environmentMessage,
-      hasTeamsContext,
-      userDisplayName
-    } = this.props;
+    
 
     return (
-      <section className={`${styles.sampleForm} ${hasTeamsContext ? styles.teams : ''}`}>
-        <div className={styles.welcome}>
-          <img alt="" src={isDarkTheme ? require('../assets/welcome-dark.png') : require('../assets/welcome-light.png')} className={styles.welcomeImage} />
-          <h2>Well done, {escape(userDisplayName)}!</h2>
-          <div>{environmentMessage}</div>
-          <div>Web part property value: <strong>{escape(description)}</strong></div>
-        </div>
-        <div>
-          <h3>Welcome to SharePoint Framework!</h3>
-          <p>
-            The SharePoint Framework (SPFx) is a extensibility model for Microsoft Viva, Microsoft Teams and SharePoint. It&#39;s the easiest way to extend Microsoft 365 with automatic Single Sign On, automatic hosting and industry standard tooling.
-          </p>
-          <h4>Learn more about SPFx development:</h4>
-          <ul className={styles.links}>
-            <li><a href="https://aka.ms/spfx" target="_blank" rel="noreferrer">SharePoint Framework Overview</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-graph" target="_blank" rel="noreferrer">Use Microsoft Graph in your solution</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-teams" target="_blank" rel="noreferrer">Build for Microsoft Teams using SharePoint Framework</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-viva" target="_blank" rel="noreferrer">Build for Microsoft Viva Connections using SharePoint Framework</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-store" target="_blank" rel="noreferrer">Publish SharePoint Framework applications to the marketplace</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-api" target="_blank" rel="noreferrer">SharePoint Framework API reference</a></li>
-            <li><a href="https://aka.ms/m365pnp" target="_blank" rel="noreferrer">Microsoft 365 Developer Community</a></li>
-          </ul>
-        </div>
-      </section>
+     <>
+     <form>
+      <TextField
+      value={this.state.Name}
+      label='Name'
+      onChange={(_,event)=>this.handleForm("Name",event||'')}
+      iconProps={{iconName:'people'}}
+      />
+        <TextField
+      value={this.state.EmailAddress}
+      label='Email Address'
+      onChange={(_,event)=>this.handleForm("EmailAddress",event||'')}
+      iconProps={{iconName:'mail'}}
+      />
+        <TextField
+      value={this.state.Age}
+      label='Age'
+      onChange={(_,event)=>this.handleForm("Age",event||'')}
+      // iconProps={{iconName:'people'}}
+      />
+        <TextField
+      value={this.state.Salary}
+      label='Salary'
+      onChange={(_,event)=>this.handleForm("Salary",event||'')}
+      // iconProps={{iconName:'people'}}
+      suffix='$'
+      prefix='USD'
+      />
+      <Slider
+      label='Score'
+      value={this.state.Score}
+      min={0}
+      max={100}
+      onChange={(event)=>this.handleForm("Score",event)}
+      />
+        <TextField
+      value={this.state.Address}
+      label='Permanent Address'
+      onChange={(_,event)=>this.handleForm("Address",event||'')}
+      iconProps={{iconName:'home'}}
+      multiline
+      rows={5}
+      />
+      <br/>
+      <PrimaryButton text='Save' onClick={()=>this.createForm()} iconProps={{iconName:'save'}}/>
+     </form>
+     </>
     );
   }
 }
