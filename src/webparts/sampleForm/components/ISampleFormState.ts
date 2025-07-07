@@ -5,4 +5,8 @@ export interface ISampleFormState{
     Age:number|any;
     Salary:number|any;
     Address:string;
+    Manager:any; // mulitselect people
+    ManagerId:any;
+    Admin:any;
+    AdminId:any;
 }
