@@ -6,8 +6,9 @@ import {Dialog} from "@microsoft/sp-dialog";
 import {Web} from "@pnp/sp/presets/all";
 import "@pnp/sp/items";
 import "@pnp/sp/lists";
-import { TextField ,Slider, PrimaryButton} from '@fluentui/react';
+import { TextField ,Slider, PrimaryButton,Dropdown,ChoiceGroup} from '@fluentui/react';
 import {PeoplePicker,PrincipalType} from "@pnp/spfx-controls-react/lib/PeoplePicker"
+// import { Dropdown } from 'antd';
 // import { Slider } from 'antd';
 export default class SampleForm extends React.Component<ISampleFormProps,ISampleFormState> {
   constructor(props:any){
@@ -22,7 +23,11 @@ export default class SampleForm extends React.Component<ISampleFormProps,ISample
       Manager:[],
       ManagerId:[],
       Admin:"",
-      AdminId:0
+      AdminId:0,
+      Department:"",
+      Gender:"",
+      City:"",
+      Skills:[]
     }
   }
   //create form
@@ -37,7 +42,11 @@ await web.lists.getByTitle(this.props.ListName).items.add({
   Score:parseInt(this.state.Score),
   Address:this.state.Address,
   ManagerId:{results:this.state.ManagerId},
-  AdminId:this.state.AdminId
+  AdminId:this.state.AdminId,
+  Department:this.state.Department,
+  CityId:this.state.City,
+  Gender:this.state.Gender,
+  Skills:{results:this.state.Skills}
 })
 .then((data)=>{
   Dialog.alert("Data has been saved successully");
@@ -159,6 +168,30 @@ else{
     webAbsoluteUrl={this.props.siteurl}
     defaultSelectedUsers={[this.state.Admin?this.state.Admin:""]}
     ensureUser={true}
+    />
+    <Dropdown
+    options={this.props.departmentOptions}
+    selectedKey={this.state.Department}
+    onChange={(_,options)=>this.handleForm("Department",options?.key as string)}
+    label='Department'
+    placeholder='--select'
+    
+    />
+    <Dropdown
+    options={this.props.cityOptions}
+    selectedKey={this.state.City}
+    onChange={(_,options)=>this.handleForm("City",options?.key as string)}
+    label='City'
+    placeholder='--select'
+    
+    />
+    <ChoiceGroup
+    options={this.props.genderOptions}
+    selectedKey={this.state.Gender}
+    onChange={(_,options)=>this.handleForm("Gender",options?.key as string)}
+    label='City'
+   
+    
     />
       <br/>
       <PrimaryButton text='Save' onClick={()=>this.createForm()} iconProps={{iconName:'save'}}/>
