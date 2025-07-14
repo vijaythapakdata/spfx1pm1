@@ -6,7 +6,7 @@ import {Dialog} from "@microsoft/sp-dialog";
 import {Web} from "@pnp/sp/presets/all";
 import "@pnp/sp/items";
 import "@pnp/sp/lists";
-import { TextField ,Slider, PrimaryButton,Dropdown,ChoiceGroup} from '@fluentui/react';
+import { TextField ,Slider, PrimaryButton,Dropdown,ChoiceGroup, IDropdownOption} from '@fluentui/react';
 import {PeoplePicker,PrincipalType} from "@pnp/spfx-controls-react/lib/PeoplePicker"
 // import { Dropdown } from 'antd';
 // import { Slider } from 'antd';
@@ -61,7 +61,9 @@ await web.lists.getByTitle(this.props.ListName).items.add({
       Manager:[],
       ManagerId:[],
       Admin:"",
-      AdminId:0
+      AdminId:0,
+      Gender:"",
+      Skills:[]
   })
 })
 .catch((err)=>{
@@ -97,6 +99,11 @@ else{
     AdminId:0
   });
 }
+}
+//skills
+private _getSkills=(event:React.FormEvent<HTMLDivElement>,options:IDropdownOption):void=>{
+  const selectedKey=options.selected?[...this.state.Skills,options.key as string]:this.state.Skills.filter((key:any)=>key!==options.key);
+  this.setState({Skills:selectedKey});
 }
   public render(): React.ReactElement<ISampleFormProps> {
     
@@ -189,7 +196,19 @@ else{
     options={this.props.genderOptions}
     selectedKey={this.state.Gender}
     onChange={(_,options)=>this.handleForm("Gender",options?.key as string)}
-    label='City'
+    label='Gender'
+   
+    
+    />
+    <Dropdown
+    options={this.props.skillsOptions}
+    // selectedKey={this.state.Gender}
+    defaultSelectedKeys={this.state.Skills}
+    // onChange={(_,options)=>this.handleForm("Gender",options?.key as string)}
+    onChange={this._getSkills}
+    placeholder='--select--'
+    label='Skills'
+    multiSelect
    
     
     />

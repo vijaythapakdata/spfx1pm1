@@ -31,7 +31,9 @@ export default class SampleFormWebPart extends BaseClientSideWebPart<ISampleForm
     siteurl:this.context.pageContext.web.absoluteUrl,
     context:this.context,
     cityOptions:cityOpt,
-     departmentOptions:await this._getChoiceValues(this.context.pageContext.web.absoluteUrl,'Department',this.properties.ListName)
+     departmentOptions:await this._getChoiceValues(this.context.pageContext.web.absoluteUrl,'Department',this.properties.ListName),
+      genderOptions:await this._getChoiceValues(this.context.pageContext.web.absoluteUrl,'Gender',this.properties.ListName),
+      skillsOptions:await this._getChoiceValues(this.context.pageContext.web.absoluteUrl,'Skills',this.properties.ListName)
       }
     );
 
